@@ -16,10 +16,11 @@ const app = express();
 
 // --- 🛠️ MIDDLEWARE ---
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: process.env.FRONTEND_URL || '*',
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"]
 }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -94,17 +95,14 @@ console.log(`📍 Starting server on port ${PORT}...`);
 server = app.listen(PORT, async () => {
     console.log(`🚀 Server listening on port ${PORT}`);
     console.log(`🛠️ Diagnostic tool: http://localhost:${PORT}/api/auth/debug-users`);
-    
-    // Test database connection
+
+    // SAFE DB CONNECTION CHECK
     try {
-        const testUser = await prisma.user.findFirst();
-        console.log('✅ Database connection verified');
+        await prisma.$connect();
+        console.log('✅ Database connected successfully');
         console.log('🟢 Server is ready to accept requests');
     } catch (err) {
         console.error('❌ Database connection failed:', err.message);
+        console.log('⚠️ Server will still run, but DB is not connected');
     }
-});
-
-server.on('error', (err) => {
-    console.error('❌ Server error:', err);
 });
