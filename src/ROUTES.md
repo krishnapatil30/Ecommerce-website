@@ -1,0 +1,1 @@
+Base URL: http://localhost:5000/api/productsActionMethodEndpointData TypeFields / ParamsCreate ProductPOST/createmultipart/form-dataname, price, categoryId, stock, description, image (File)Get All ProductsGET/JSONNoneDelete ProductDELETE/:idURL Param

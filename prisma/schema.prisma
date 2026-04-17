@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  orders    Order[]
+  reviews   Review[]
+  wishlists Wishlist[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id          Int            @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int            @default(0)
+  imageUrl    String?
+  categoryId  Int
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  createdBy   Int            @default(1)
+  orderItems  OrderItem[]
+  category    Category       @relation(fields: [categoryId], references: [id])
+  images      ProductImage[]
+  reviews     Review[]
+  wishlists   Wishlist[]
+}
+
+model Order {
+  id               Int         @id @default(autoincrement())
+  userId           Int
+  total            Float
+  status           String      @default("pending")
+  paymentId        String?     @unique
+  paymentStatus    String      @default("pending")
+  shippingPhone    String?
+  shippingAddress  String?
+  shippingCity     String?
+  shippingState    String?
+  shippingZipCode  String?
+  paymentMethod    String?     @default("card")
+  createdAt        DateTime    @default(now())
+  user             User        @relation(fields: [userId], references: [id])
+  items            OrderItem[]
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  imageUrl  String
+  alt       String?
+  order     Int     @default(0)
+  createdAt DateTime @default(now())
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  userId    Int
+  rating    Int
+  text      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
+}
+
+model Wishlist {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  productId Int
+  createdAt DateTime @default(now())
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+}
+
+model Coupon {
+  id         Int     @id @default(autoincrement())
+  code       String  @unique
+  discount   Float
+  type       String  @default("percentage")
+  maxUses    Int?
+  currentUses Int   @default(0)
+  expiresAt  DateTime?
+  createdAt  DateTime @default(now())
+}

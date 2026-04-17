@@ -1,0 +1,19 @@
+// import { defineConfig } from '@prisma/config';
+// import * as dotenv from 'dotenv';
+// import path from 'path';
+
+// // This forces it to find the .env file in your current folder
+// dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+
+// export default defineConfig({
+//   datasource: {
+//     url: process.env.DATABASE_URL!,
+//   },
+// });
+import { defineConfig } from '@prisma/config';
+
+export default defineConfig({
+  datasource: {
+    url: process.env.DATABASE_URL,
+  },
+});
